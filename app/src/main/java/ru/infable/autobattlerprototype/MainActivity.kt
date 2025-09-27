@@ -20,8 +20,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.infable.autobattlerprototype.ui.theme.AutoBattlerPrototypeTheme
 import ru.infable.autobattlerprototype.game.GameLogic
 import kotlinx.coroutines.delay
@@ -30,6 +34,11 @@ import ru.infable.autobattlerprototype.models.Character
 import ru.infable.autobattlerprototype.models.CharacterClass
 import ru.infable.autobattlerprototype.models.Monster
 import ru.infable.autobattlerprototype.models.MonsterFactory
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.RectangleShape
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,13 +101,22 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WelcomeScreen(onStartGame: () -> Unit) {
+    val OiFontFamily = FontFamily(
+        Font(R.font.oi_regular, FontWeight.Normal) // Указываем имя шрифта из res/font
+    )
+
+    val gradientBrush = Brush.linearGradient(colors = listOf(
+        Color.hsl(190f, 1f, 0.94f, 1f),
+        Color.hsl(189f, 0.37f, 0.63f, 1f)
+    ))
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Фоновое изображение
         Image(
-            painter = painterResource(id = R.drawable.welcome_background), // Замените на имя вашего файла
+            painter = painterResource(id = R.drawable.welcome_background),
             contentDescription = "Background Image",
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop // Сохраняет пропорции, обрезая лишнее
+            contentScale = ContentScale.FillBounds
         )
 
         // Содержимое поверх фона
@@ -109,8 +127,13 @@ fun WelcomeScreen(onStartGame: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("Добро пожаловать в AutoBattler!", color = Color.White)
-            Text("Нажмите, чтобы начать игру", color = Color.White)
+            Text(
+                "АВТО\n       БАТТЛЕР",
+                fontSize = 64.sp,
+                fontFamily = OiFontFamily,
+                style = TextStyle(brush = gradientBrush),
+                fontWeight = FontWeight.Normal
+            )
             Button(onClick = onStartGame) {
                 Text("Начать", color = Color.Black)
             }
