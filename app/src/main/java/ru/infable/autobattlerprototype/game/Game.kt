@@ -96,5 +96,3 @@ object GameLogic {
         return false // Не должно дойти сюда
     }
 }
-
-fun main() { GameLogic.startGame() }
