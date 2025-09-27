@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,7 +16,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import ru.infable.autobattlerprototype.ui.theme.AutoBattlerPrototypeTheme
 import ru.infable.autobattlerprototype.game.GameLogic
 import kotlinx.coroutines.delay
@@ -27,13 +35,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var currentScreen by remember { mutableStateOf("CharacterCreation") }
+            var currentScreen by remember { mutableStateOf("Welcome") }
             var player by remember { mutableStateOf(Character()) }
             var monster by remember { mutableStateOf(MonsterFactory.getRandomMonster()) }
             var battleLog by remember { mutableStateOf("") }
             val scope = rememberCoroutineScope()
 
             when (currentScreen) {
+                "Welcome" -> WelcomeScreen(
+                    onStartGame = { currentScreen = "CharacterCreation" }
+                )
                 "CharacterCreation" -> CharacterCreationScreen(
                     onClassSelected = { chosenClass ->
                         player.initialize(chosenClass)
@@ -74,6 +85,34 @@ class MainActivity : ComponentActivity() {
                     currentScreen = "CharacterCreation"
                     battleLog = ""
                 })
+            }
+        }
+    }
+}
+
+@Composable
+fun WelcomeScreen(onStartGame: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Фоновое изображение
+        Image(
+            painter = painterResource(id = R.drawable.welcome_background), // Замените на имя вашего файла
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop // Сохраняет пропорции, обрезая лишнее
+        )
+
+        // Содержимое поверх фона
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("Добро пожаловать в AutoBattler!", color = Color.White)
+            Text("Нажмите, чтобы начать игру", color = Color.White)
+            Button(onClick = onStartGame) {
+                Text("Начать", color = Color.Black)
             }
         }
     }
