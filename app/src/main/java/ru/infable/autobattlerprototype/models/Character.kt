@@ -127,5 +127,3 @@ class Character {
     // Проверка жив ли персонаж
     fun isAlive(): Boolean = currentHealth > 0
 }
-
-}
