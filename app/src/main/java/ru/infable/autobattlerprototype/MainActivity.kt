@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import ru.infable.autobattlerprototype.ui.theme.AutoBattlerPrototypeTheme
 import ru.infable.autobattlerprototype.game.GameLogic
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.infable.autobattlerprototype.models.Character
 import ru.infable.autobattlerprototype.models.CharacterClass
@@ -43,19 +44,19 @@ class MainActivity : ComponentActivity() {
                     player = player,
                     monster = monster,
                     onBattleEnd = { win ->
-                        if (win) {
-                            player.winsInRow++
-                            player.restoreHealth()
-                            battleLog += "Победа! Выпало ${monster.reward.name}\n"
-                            if (player.winsInRow == 3) currentScreen = "GameWon"
-                            else {
-                                monster = MonsterFactory.getRandomMonster()
-                                currentScreen = "LevelUp"
+                        scope.launch {
+                            delay(500) // Задержка для отображения результата
+                            if (win) {
+                                player.winsInRow++
+                                player.restoreHealth()
+                                battleLog += "Победа! Выпало ${monster.reward.name}\n"
+                                if (player.winsInRow == 3) currentScreen = "GameWon"
+                                else currentScreen = "LevelUp"
+                            } else {
+                                player.winsInRow = 0
+                                currentScreen = "CharacterCreation"
+                                battleLog = "Поражение!\n"
                             }
-                        } else {
-                            player.winsInRow = 0
-                            currentScreen = "CharacterCreation"
-                            battleLog = "Поражение!\n"
                         }
                     },
                     log = battleLog
@@ -65,9 +66,14 @@ class MainActivity : ComponentActivity() {
                     onLevelUp = { newClass ->
                         player.levelUp(newClass)
                         currentScreen = "Battle"
+                        monster = MonsterFactory.getRandomMonster() // Новый монстр
                     }
                 )
-                "GameWon" -> GameWonScreen(onRestart = { currentScreen = "CharacterCreation" })
+                "GameWon" -> GameWonScreen(onRestart = {
+                    player = Character() // Сброс персонажа
+                    currentScreen = "CharacterCreation"
+                    battleLog = ""
+                })
             }
         }
     }
@@ -92,9 +98,8 @@ fun BattleScreen(player: Character, monster: Monster, onBattleEnd: (Boolean) -> 
 
     LaunchedEffect(Unit) {
         scope.launch {
-            val win = GameLogic.simulateBattle(player, monster)
-            localLog += if (win) "Победа!\n" else "Поражение!\n"
-            onBattleEnd(win)
+            delay(1000) // Задержка для чтения лога
+            onBattleEnd(player.isAlive()) // Передаём результат боя
         }
     }
 
@@ -123,21 +128,5 @@ fun GameWonScreen(onRestart: () -> Unit) {
         Button(onClick = onRestart) {
             Text("Начать заново")
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AutoBattlerPrototypeTheme {
-        Greeting("Android")
     }
 }
