@@ -1,6 +1,5 @@
 package ru.infable.autobattlerprototype.models
 
-import ru.infable.autobattlerprototype.models.Character
 import kotlin.random.Random
 
 class Character {
@@ -11,7 +10,7 @@ class Character {
     var constitution: Int = Random.nextInt(1, 4)
 
     // Уровни классов для мультикласса (начальный класс + уровни)
-    private val levels = mutableMapOf<CharacterClass, Int>()
+    val levels = mutableMapOf<CharacterClass, Int>()
     var currentWeapon: Weapon = Weapon.DAGGER // Начальное оружие по умолчанию
     var maxHealth: Int = 0 // Максимальное здоровье
     var currentHealth: Int = 0 // Текущее здоровье
