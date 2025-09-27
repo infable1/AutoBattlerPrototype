@@ -77,7 +77,7 @@ class Character {
     }
 
     // Логика атаки (упрощенная, для боя)
-    fun calculateDamage(target: Character, turn: Int): Int {
+    fun calculateDamage(target: Monster, turn: Int): Int {
         var baseDamage = currentWeapon.damage + strength
 
         // Бонусы атакующего
