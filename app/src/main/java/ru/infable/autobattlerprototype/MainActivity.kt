@@ -514,7 +514,213 @@ fun CharacterRogueScreen(
     onLeft: () -> Unit
 ) {
 
-    
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        Image(
+            painter = painterResource(id = R.drawable.choose_background),
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
+
+        Row (
+            horizontalArrangement = Arrangement.Absolute.Center,
+            verticalAlignment = Alignment.Top
+        ) {
+
+            Image(
+                painter = painterResource(id = R.drawable.choose_left),
+                contentDescription = "Left",
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier
+                    .padding(horizontal = 24.dp, vertical = 180.dp)
+                    .clickable(enabled = true, onClick = onLeft)
+            )
+
+            Column(
+                modifier = Modifier.padding(start = (4.25).dp, top = 27.dp)
+            ) {
+
+                Text(
+                    text = "ВЫБЕРИТЕ КЛАСС:",
+                    fontSize = 15.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold
+                )
+
+                Text (
+                    text = "РАЗБОЙНИК",
+                    fontSize = 36.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold
+                )
+
+                Text(
+                    text = "Разбойник — хищник, который выбирает свою\nжертву. Ваша задача — не вступать в честный бой,\nа терпеливо ждать момента для идеальной атаки.\nВы должны выслеживать одиноких врагов,\nослабленных после боя, или быстро уничтожать\nключевые цели (магов, лекарей) в групповом\nсражении.",
+                    fontSize = 10.sp,
+                    color = Color.White,
+                    fontFamily = OnestRegularFontFamily,
+                    fontWeight = FontWeight.Normal
+                )
+
+            }
+
+            Box(
+                modifier = Modifier.padding(top = 19.dp)
+            ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.choose_robber),
+                    contentDescription = "Rogue",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .size(279.dp)
+                        .offset(
+                            x = ((-15).dp),
+                            y = 0.dp
+                        )
+                )
+
+            }
+
+            Column(
+                modifier = Modifier
+                    .offset(
+                        x = ((-70).dp),
+                        y = 61.dp
+                    )
+                    .size(200.dp)
+            ) {
+
+                Text(
+                    text = "МАКСИМАЛЬНЫЕ ПОКАЗАТЕЛИ:",
+                    fontSize = 14.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold
+                )
+
+                Box {
+
+                    Text(
+                        text = "Урон от атак",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = OnestRegularFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.warrior_damage),
+                        contentDescription = "Rectangle",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .offset(
+                                x = (110.dp),
+                                y = ((6.5).dp)
+                            )
+                    )
+
+                }
+
+                Box {
+
+                    Text(
+                        text = "Сила в бою",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = OnestRegularFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.warrior_strength),
+                        contentDescription = "Rectangle",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .offset(
+                                x = (111.dp),
+                                y = ((6.5).dp)
+                            )
+                    )
+
+                }
+
+                Box {
+
+                    Text(
+                        text = "Ловкость",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = OnestRegularFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.warrior_agility),
+                        contentDescription = "Rectangle",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .offset(
+                                x = (111.dp),
+                                y = ((6.5).dp)
+                            )
+                    )
+
+                }
+
+                Box {
+
+                    Text(
+                        text = "Выносливость",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = OnestRegularFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.warrior_endurance),
+                        contentDescription = "Rectangle",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .offset(
+                                x = (111.dp),
+                                y = ((6.5).dp)
+                            )
+                    )
+
+                }
+
+            }
+
+        }
+
+        Button(
+            onClick = { onClassSelected(CharacterClass.WARRIOR) },
+            modifier = Modifier
+                .width(293.dp)
+                .height(42.dp)
+                .offset(
+                    x = 260.dp,
+                    y = 320.dp
+                ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.hsl(190f, 0.84f, 0.29f, 1f),
+                contentColor = Color.White
+            )
+        ) {
+            Text(
+                text = "ВЫБРАТЬ",
+                fontSize = 20.sp,
+                fontFamily = OnestExtraBoldFontFamily,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+
+    }
 
 }
 
