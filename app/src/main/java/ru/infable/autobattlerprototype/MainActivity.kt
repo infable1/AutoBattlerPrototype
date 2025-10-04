@@ -700,7 +700,7 @@ fun CharacterRogueScreen(
         }
 
         Button(
-            onClick = { onClassSelected(CharacterClass.WARRIOR) },
+            onClick = { onClassSelected(CharacterClass.ROGUE) },
             modifier = Modifier
                 .width(293.dp)
                 .height(42.dp)
@@ -730,7 +730,222 @@ fun CharacterBarbarianScreen(
     onRight: () -> Unit,
     onClassSelected: (CharacterClass) -> Unit
 ) {
-    
+
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        Image(
+            painter = painterResource(id = R.drawable.choose_background),
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
+
+
+        Row (
+            horizontalArrangement = Arrangement.Absolute.Center,
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier.padding(start = (57.8).dp)
+        ) {
+
+            Column(
+                modifier = Modifier.padding(start = (4.25).dp, top = 27.dp)
+            ) {
+
+                Text(
+                    text = "ВЫБЕРИТЕ КЛАСС:",
+                    fontSize = 15.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold
+                )
+
+                Text (
+                    text = "ВАРВАР",
+                    fontSize = 36.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold
+                )
+
+                Text(
+                    text = "Варвар — это ураган из стали и гнева.\nОн не знает пощады и не ведает страха.\nВойдите в состояние берсерка, чтобы ваша атака\nи скорость достигали невероятных значений,\nа здоровье возвращалось с каждым нанесённым\nударом!",
+                    fontSize = 10.sp,
+                    color = Color.White,
+                    fontFamily = OnestRegularFontFamily,
+                    fontWeight = FontWeight.Normal
+                )
+
+            }
+
+            Box(
+                modifier = Modifier.padding(top = 19.dp)
+            ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.choose_barbarian),
+                    contentDescription = "Warrior",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .size(
+                            width = 556.dp,
+                            height = 300.dp)
+                        .offset(
+                            x = ((-172).dp),
+                            y = ((-10).dp)
+                        )
+                )
+
+            }
+
+        }
+
+        Button(
+            onClick = { onClassSelected(CharacterClass.BARBARIAN) },
+            modifier = Modifier
+                .width(293.dp)
+                .height(42.dp)
+                .offset(
+                    x = 260.dp,
+                    y = 320.dp
+                ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.hsl(190f, 0.84f, 0.29f, 1f),
+                contentColor = Color.White
+            )
+        ) {
+            Text(
+                text = "ВЫБРАТЬ",
+                fontSize = 20.sp,
+                fontFamily = OnestExtraBoldFontFamily,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .offset(
+                    x = ((520.6).dp),
+                    y = 61.dp
+                )
+                .size(200.dp)
+        ) {
+
+            Text(
+                text = "МАКСИМАЛЬНЫЕ ПОКАЗАТЕЛИ:",
+                fontSize = 14.sp,
+                color = Color.White,
+                fontFamily = OnestExtraBoldFontFamily,
+                fontWeight = FontWeight.ExtraBold
+            )
+
+            Box {
+
+                Text(
+                    text = "Урон от атак",
+                    fontSize = 14.sp,
+                    color = Color.White,
+                    fontFamily = OnestRegularFontFamily,
+                    fontWeight = FontWeight.Normal
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.barbarian_damage),
+                    contentDescription = "Rectangle",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .offset(
+                            x = (110.dp),
+                            y = ((6.5).dp)
+                        )
+                )
+
+            }
+
+            Box {
+
+                Text(
+                    text = "Сила в бою",
+                    fontSize = 14.sp,
+                    color = Color.White,
+                    fontFamily = OnestRegularFontFamily,
+                    fontWeight = FontWeight.Normal
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.barbarian_strength),
+                    contentDescription = "Rectangle",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .offset(
+                            x = (111.dp),
+                            y = ((6.5).dp)
+                        )
+                )
+
+            }
+
+            Box {
+
+                Text(
+                    text = "Ловкость",
+                    fontSize = 14.sp,
+                    color = Color.White,
+                    fontFamily = OnestRegularFontFamily,
+                    fontWeight = FontWeight.Normal
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.barbarian_agility),
+                    contentDescription = "Rectangle",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .offset(
+                            x = (111.dp),
+                            y = ((6.5).dp)
+                        )
+                )
+
+            }
+
+            Box {
+
+                Text(
+                    text = "Выносливость",
+                    fontSize = 14.sp,
+                    color = Color.White,
+                    fontFamily = OnestRegularFontFamily,
+                    fontWeight = FontWeight.Normal
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.barbarian_endurance),
+                    contentDescription = "Rectangle",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .offset(
+                            x = (111.dp),
+                            y = ((6.5).dp)
+                        )
+                )
+
+            }
+
+        }
+
+        Image(
+            painter = painterResource(id = R.drawable.choose_right),
+            contentDescription = "Right",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .padding(top = 180.dp)
+                .offset(
+                    x = ((770.5).dp),
+                    y = 0.dp
+                )
+                .clickable(enabled = true, onClick = onRight)
+        )
+
+    }
 
 }
 
