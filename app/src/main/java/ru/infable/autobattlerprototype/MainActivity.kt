@@ -1,12 +1,17 @@
 package ru.infable.autobattlerprototype
 
+import android.media.Image
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageButton
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -37,11 +42,31 @@ import ru.infable.autobattlerprototype.models.MonsterFactory
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+
+val OiFontFamily = FontFamily(
+    Font(R.font.oi_regular, FontWeight.Normal)
+)
+
+val OnestExtraBoldFontFamily = FontFamily(
+    Font(R.font.onest_extrabold, weight = FontWeight.ExtraBold)
+)
+
+val OnestRegularFontFamily = FontFamily(
+    Font(R.font.onest_regular, weight = FontWeight.Normal)
+)
+
+val InterRegularFontFamily = FontFamily(
+    Font(R.font.inter_regular, weight = FontWeight.Normal)
+)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
+        hideSystemUI()
+
         setContent {
             var currentScreen by remember { mutableStateOf("Welcome") }
             var player by remember { mutableStateOf(Character()) }
@@ -51,9 +76,25 @@ class MainActivity : ComponentActivity() {
 
             when (currentScreen) {
                 "Welcome" -> WelcomeScreen(
-                    onStartGame = { currentScreen = "CharacterCreation" }
+                    onStartGame = { currentScreen = "WarriorCreation" }
                 )
-                "CharacterCreation" -> CharacterCreationScreen(
+                "WarriorCreation" -> CharacterWarriorScreen(
+                    onRight = { currentScreen = "RogueCreation"},
+                    onLeft = { currentScreen = "BarbarianCreation"},
+                    onClassSelected = { chosenClass ->
+                        player.initialize(chosenClass)
+                        currentScreen = "Battle"
+                    }
+                )
+                "RogueCreation" -> CharacterRogueScreen(
+                    onLeft = { currentScreen = "WarriorCreation" },
+                    onClassSelected = { chosenClass ->
+                        player.initialize(chosenClass)
+                        currentScreen = "Battle"
+                    }
+                )
+                "BarbarianCreation" -> CharacterBarbarianScreen(
+                    onRight = { currentScreen = "WarriorCreation"},
                     onClassSelected = { chosenClass ->
                         player.initialize(chosenClass)
                         currentScreen = "Battle"
@@ -64,7 +105,7 @@ class MainActivity : ComponentActivity() {
                     monster = monster,
                     onBattleEnd = { win ->
                         scope.launch {
-                            delay(500) // Задержка для отображения результата
+                            delay(500)
                             if (win) {
                                 player.winsInRow++
                                 player.restoreHealth()
@@ -96,36 +137,38 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun hideSystemUI() {
+        window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        or View.SYSTEM_UI_FLAG_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                )
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            hideSystemUI()
+        }
+    }
+
 }
 
 @Composable
 fun WelcomeScreen(onStartGame: () -> Unit) {
-    val OiFontFamily = FontFamily(
-        Font(R.font.oi_regular, FontWeight.Normal)
-    )
-
-    val OnestFontFamily = FontFamily(
-        Font(R.font.onest_extrabold, weight = FontWeight.Normal)
-    )
 
     val gradientWelcomeText = Brush.linearGradient(
         colors = listOf(
         Color.hsl(190f, 0.36f, 0.5f, 1f),
         Color.hsl(190f, 1f, 0.94f, 1f)
-
         ),
         start = Offset.Zero,
         end = Offset.Infinite
     )
 
-    val gradientWelcomeButton = Brush.linearGradient(colors = listOf(
-        Color.hsl(190f, 0.98f, 0.22f, 1f),
-        Color.hsl(189f, 0.66f, 0.46f, 1f),
-        Color.hsl(190f, 0.84f, 0.29f, 1f)
-    ))
-
     Box(modifier = Modifier.fillMaxSize()) {
-        // Фоновое изображение
+
         Image(
             painter = painterResource(id = R.drawable.welcome_background),
             contentDescription = "Background Image",
@@ -133,7 +176,6 @@ fun WelcomeScreen(onStartGame: () -> Unit) {
             contentScale = ContentScale.FillBounds
         )
 
-        // Содержимое поверх фона
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -166,8 +208,6 @@ fun WelcomeScreen(onStartGame: () -> Unit) {
                         )
                 )
 
-
-
                 Image(
                     painter = painterResource(id = R.drawable.ic_sword_wlcm_text_1),
                     contentDescription = "Sword Text",
@@ -188,18 +228,18 @@ fun WelcomeScreen(onStartGame: () -> Unit) {
                 Button(
                     onClick = onStartGame,
                     modifier = Modifier
-                        .width(293.dp) // Устанавливаем фиксированную ширину
-                        .height(58.dp), // Устанавливаем фиксированную высоту
+                        .width(293.dp)
+                        .height(58.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.hsl(190f, 0.84f, 0.29f, 1f),
-                        contentColor = Color.White // Цвет текста на кнопке
+                        contentColor = Color.White
                     )
                 ) {
                     Text(
                         text = "НАЧАТЬ ИГРУ",
                         fontSize = 22.sp,
-                        fontFamily = OnestFontFamily,
-                        fontWeight = FontWeight.Normal
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold
                     )
                 }
 
@@ -241,15 +281,249 @@ fun WelcomeScreen(onStartGame: () -> Unit) {
 }
 
 @Composable
-fun CharacterCreationScreen(onClassSelected: (CharacterClass) -> Unit) {
-    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Выберите класс:")
-        CharacterClass.values().forEach { classType ->
-            Button(onClick = { onClassSelected(classType) }) {
-                Text(classType.name)
+fun CharacterWarriorScreen(
+    onClassSelected: (CharacterClass) -> Unit,
+    onLeft: () -> Unit,
+    onRight: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        Image(
+            painter = painterResource(id = R.drawable.choose_background),
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
+
+
+            Row (
+                horizontalArrangement = Arrangement.Absolute.Center,
+                verticalAlignment = Alignment.Top
+            ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.choose_left),
+                    contentDescription = "Left",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp, vertical = 180.dp)
+                        .clickable(enabled = true, onClick = onLeft)
+                )
+
+                Column(
+                    modifier = Modifier.padding(start = (4.25).dp, top = 27.dp)
+                ) {
+
+                    Text(
+                        text = "ВЫБЕРИТЕ КЛАСС:",
+                        fontSize = 15.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+
+                    Text (
+                        text = "ВОИН",
+                        fontSize = 36.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+
+                    Text(
+                        text = "Воин — это основа вашей команды.\nВаша задача — быть на передовой, принимать на\nсебя основной удар и создавать возможности для\nсоюзников. Вы врываетесь в самую гущу схватки,\nиспользуете умения для контроля вражеских героев\nи позволяете своим товарищам безопасно наносить\nурон.",
+                        fontSize = 10.sp,
+                        color = Color.White,
+                        fontFamily = OnestRegularFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                }
+
+                Box(
+                    modifier = Modifier.padding(top = 19.dp)
+                ) {
+
+                    Image(
+                        painter = painterResource(id = R.drawable.choose_warrior),
+                        contentDescription = "Warrior",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .size(279.dp)
+                            .offset(
+                                x = ((-45).dp),
+                                y = 0.dp
+                            )
+                    )
+
+                }
+
+                Column(
+                    modifier = Modifier
+                        .offset(
+                            x = ((-70).dp),
+                            y = 61.dp
+                        )
+                        .size(200.dp)
+                ) {
+
+                    Text(
+                        text = "МАКСИМАЛЬНЫЕ ПОКАЗАТЕЛИ:",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+
+                    Box {
+
+                        Text(
+                            text = "Урон от атак",
+                            fontSize = 14.sp,
+                            color = Color.White,
+                            fontFamily = OnestRegularFontFamily,
+                            fontWeight = FontWeight.Normal
+                        )
+
+                        Image(
+                            painter = painterResource(id = R.drawable.warrior_damage),
+                            contentDescription = "Rectangle",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .offset(
+                                    x = (110.dp),
+                                    y = ((6.5).dp)
+                                )
+                        )
+
+                    }
+
+                    Box {
+
+                        Text(
+                            text = "Сила в бою",
+                            fontSize = 14.sp,
+                            color = Color.White,
+                            fontFamily = OnestRegularFontFamily,
+                            fontWeight = FontWeight.Normal
+                        )
+
+                        Image(
+                            painter = painterResource(id = R.drawable.warrior_strength),
+                            contentDescription = "Rectangle",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .offset(
+                                    x = (111.dp),
+                                    y = ((6.5).dp)
+                                )
+                        )
+
+                    }
+
+                    Box {
+
+                        Text(
+                            text = "Ловкость",
+                            fontSize = 14.sp,
+                            color = Color.White,
+                            fontFamily = OnestRegularFontFamily,
+                            fontWeight = FontWeight.Normal
+                        )
+
+                        Image(
+                            painter = painterResource(id = R.drawable.warrior_agility),
+                            contentDescription = "Rectangle",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .offset(
+                                    x = (111.dp),
+                                    y = ((6.5).dp)
+                                )
+                        )
+
+                    }
+
+                    Box {
+
+                        Text(
+                            text = "Выносливость",
+                            fontSize = 14.sp,
+                            color = Color.White,
+                            fontFamily = OnestRegularFontFamily,
+                            fontWeight = FontWeight.Normal
+                        )
+
+                        Image(
+                            painter = painterResource(id = R.drawable.warrior_endurance),
+                            contentDescription = "Rectangle",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .offset(
+                                    x = (111.dp),
+                                    y = ((6.5).dp)
+                                )
+                        )
+
+                    }
+
+                }
+
+                Image(
+                    painter = painterResource(id = R.drawable.choose_right),
+                    contentDescription = "Right",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .padding(top = 180.dp)
+                        .offset(
+                            x = ((-20).dp),
+                            y = 0.dp
+                        )
+                        .clickable(enabled = true, onClick = onRight)
+                )
+
             }
+
+        Button(
+            onClick = { onClassSelected(CharacterClass.WARRIOR) },
+            modifier = Modifier
+                .width(293.dp)
+                .height(42.dp)
+                .offset(
+                    x = 260.dp,
+                    y = 320.dp
+                ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.hsl(190f, 0.84f, 0.29f, 1f),
+                contentColor = Color.White
+            )
+        ) {
+            Text(
+                text = "ВЫБРАТЬ",
+                fontSize = 20.sp,
+                fontFamily = OnestExtraBoldFontFamily,
+                fontWeight = FontWeight.ExtraBold
+            )
         }
+
     }
+}
+
+@Composable
+fun CharacterRogueScreen(
+    onClassSelected: (CharacterClass) -> Unit,
+    onLeft: () -> Unit
+) {
+
+    
+
+}
+
+@Composable
+fun CharacterBarbarianScreen(
+    onRight: () -> Unit,
+    onClassSelected: (CharacterClass) -> Unit
+) {
+
 }
 
 @Composable

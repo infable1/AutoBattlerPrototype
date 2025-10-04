@@ -4,32 +4,27 @@ import kotlin.random.Random
 
 class Character {
 
-    // Атрибуты персонажа (начальные значения от 1 до 3)
     var strength: Int = Random.nextInt(1, 4)
     var dexterity: Int = Random.nextInt(1, 4)
     var constitution: Int = Random.nextInt(1, 4)
 
-    // Уровни классов для мультикласса (начальный класс + уровни)
     val levels = mutableMapOf<CharacterClass, Int>()
-    var currentWeapon: Weapon = Weapon.DAGGER // Начальное оружие по умолчанию
-    var maxHealth: Int = 0 // Максимальное здоровье
-    var currentHealth: Int = 0 // Текущее здоровье
-    var winsInRow: Int = 0 // Подряд побед для условия завершения игры
+    var currentWeapon: Weapon = Weapon.DAGGER
+    var maxHealth: Int = 0
+    var currentHealth: Int = 0
+    var winsInRow: Int = 0
 
-    // Инициализация при выборе класса
     fun initialize(chosenClass: CharacterClass) {
-        levels[chosenClass] = 1 // Устанавливаем начальный уровень
+        levels[chosenClass] = 1
         currentWeapon = chosenClass.startingWeapon
         recalculateMaxHealth()
-        currentHealth = maxHealth // Восстанавливаем здоровье
+        currentHealth = maxHealth
     }
 
-    // Пересчет максимального здоровья
     private fun recalculateMaxHealth() {
         maxHealth = levels.entries.sumBy { it.value * it.key.healthPerLevel } + constitution
     }
 
-    // Повышение уровня с выбором нового класса
     fun levelUp(newClass: CharacterClass) {
         levels[newClass] = (levels[newClass] ?: 0) + 1
         when (newClass) {

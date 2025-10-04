@@ -48,7 +48,6 @@ object GameLogic {
         return player
     }
 
-    // Симуляция боя
     fun simulateBattle(player: Character, monster: Monster): Boolean {
         player.restoreHealth()
         monster.restoreHealth()
