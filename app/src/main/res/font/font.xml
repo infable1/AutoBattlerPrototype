@@ -3,4 +3,5 @@
     <font android:font="@font/oi_regular" android:fontStyle="normal" android:fontWeight="400" />
     <font android:font="@font/onest_extrabold" android:fontStyle="normal" android:fontWeight="800" />
     <font android:font="@font/onest_regular" android:fontStyle="normal" android:fontWeight="400"/>
+    <font android:font="@font/inter_regular" android:fontStyle="normal" android:fontWeight="400"/>
 </font-family>
