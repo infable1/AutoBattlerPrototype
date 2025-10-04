@@ -285,6 +285,7 @@ fun CharacterWarriorScreen(
     onClassSelected: (CharacterClass) -> Unit,
     onLeft: () -> Unit,
     onRight: () -> Unit) {
+
     Box(modifier = Modifier.fillMaxSize()) {
 
         Image(
@@ -588,7 +589,7 @@ fun CharacterRogueScreen(
             Column(
                 modifier = Modifier
                     .offset(
-                        x = ((-70).dp),
+                        x = ((-59.6).dp),
                         y = 61.dp
                     )
                     .size(200.dp)
@@ -613,7 +614,7 @@ fun CharacterRogueScreen(
                     )
 
                     Image(
-                        painter = painterResource(id = R.drawable.warrior_damage),
+                        painter = painterResource(id = R.drawable.rogue_damage),
                         contentDescription = "Rectangle",
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier
@@ -636,7 +637,7 @@ fun CharacterRogueScreen(
                     )
 
                     Image(
-                        painter = painterResource(id = R.drawable.warrior_strength),
+                        painter = painterResource(id = R.drawable.rogue_strength),
                         contentDescription = "Rectangle",
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier
@@ -659,7 +660,7 @@ fun CharacterRogueScreen(
                     )
 
                     Image(
-                        painter = painterResource(id = R.drawable.warrior_agility),
+                        painter = painterResource(id = R.drawable.rogue_agility),
                         contentDescription = "Rectangle",
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier
@@ -682,7 +683,7 @@ fun CharacterRogueScreen(
                     )
 
                     Image(
-                        painter = painterResource(id = R.drawable.warrior_endurance),
+                        painter = painterResource(id = R.drawable.rogue_endurance),
                         contentDescription = "Rectangle",
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier
@@ -729,6 +730,7 @@ fun CharacterBarbarianScreen(
     onRight: () -> Unit,
     onClassSelected: (CharacterClass) -> Unit
 ) {
+    
 
 }
 
