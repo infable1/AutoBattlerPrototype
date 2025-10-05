@@ -7,7 +7,7 @@ import ru.infable.autobattlerprototype.models.MonsterFactory
 import kotlin.random.Random
 
 object GameLogic {
-    // Основной цикл игры (упрощенный, для консоли или UI интеграции)
+
     fun startGame() {
         var player = createCharacter()
         var winsInRow = 0

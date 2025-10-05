@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -82,44 +84,23 @@ class MainActivity : ComponentActivity() {
                     onRight = { currentScreen = "RogueCreation"},
                     onLeft = { currentScreen = "BarbarianCreation"},
                     onClassSelected = { chosenClass ->
-                        player.initialize(chosenClass)
                         currentScreen = "Battle"
                     }
                 )
                 "RogueCreation" -> CharacterRogueScreen(
                     onLeft = { currentScreen = "WarriorCreation" },
                     onClassSelected = { chosenClass ->
-                        player.initialize(chosenClass)
                         currentScreen = "Battle"
                     }
                 )
                 "BarbarianCreation" -> CharacterBarbarianScreen(
                     onRight = { currentScreen = "WarriorCreation"},
                     onClassSelected = { chosenClass ->
-                        player.initialize(chosenClass)
                         currentScreen = "Battle"
                     }
                 )
                 "Battle" -> BattleScreen(
-                    player = player,
-                    monster = monster,
-                    onBattleEnd = { win ->
-                        scope.launch {
-                            delay(500)
-                            if (win) {
-                                player.winsInRow++
-                                player.restoreHealth()
-                                battleLog += "Победа! Выпало ${monster.reward.name}\n"
-                                if (player.winsInRow == 3) currentScreen = "GameWon"
-                                else currentScreen = "LevelUp"
-                            } else {
-                                player.winsInRow = 0
-                                currentScreen = "CharacterCreation"
-                                battleLog = "Поражение!\n"
-                            }
-                        }
-                    },
-                    log = battleLog
+
                 )
                 "LevelUp" -> LevelUpScreen(
                     player = player,
@@ -294,7 +275,6 @@ fun CharacterWarriorScreen(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
         )
-
 
             Row (
                 horizontalArrangement = Arrangement.Absolute.Center,
@@ -484,8 +464,72 @@ fun CharacterWarriorScreen(
 
             }
 
+        val openDialog = remember { mutableStateOf(false) }
+        if (openDialog.value) {
+            AlertDialog(
+                onDismissRequest = { openDialog.value = false},
+                text = {
+                  Text(
+                      text = "ВЫ ВЫБРАЛИ КЛАСС: ВОИН",
+                      fontSize = 15.sp,
+                      color = Color.White,
+                      fontFamily = OnestExtraBoldFontFamily,
+                      fontWeight = FontWeight.ExtraBold,
+                      modifier = Modifier.offset(
+                          x = (24.dp),
+                          y = 0.dp
+                      )
+                  )
+                },
+                containerColor = Color.hsl(190f, 0.84f, 0.29f, 0.8f),
+                modifier = Modifier.size(
+                    width = 431.dp,
+                    height = 131.dp
+                ),
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            onClassSelected(CharacterClass.WARRIOR)
+                            openDialog.value = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.hsl(190f, 0.84f, 0.29f, 1f),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(
+                                width = 293.dp,
+                                height = 42.dp
+                            )
+                    ) {
+                        Text(
+                            text= "В БОЙ",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.offset(
+                                x = 10.dp,
+                                y = 0.dp
+                            )
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_alert_battle),
+                            contentDescription = "Battle",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(29.dp)
+                                .offset(
+                                    x = 13.dp,
+                                    y = 0.dp
+                                )
+                        )
+                    }
+                }
+            )
+        }
+
         Button(
-            onClick = { onClassSelected(CharacterClass.WARRIOR) },
+            onClick = { openDialog.value = true },
             modifier = Modifier
                 .width(293.dp)
                 .height(42.dp)
@@ -699,8 +743,74 @@ fun CharacterRogueScreen(
 
         }
 
+        val openDialog = remember { mutableStateOf(false) }
+        if (openDialog.value) {
+            AlertDialog(
+                onDismissRequest = {
+                    openDialog.value = false
+                },
+                text = {
+                    Text(
+                        text = "ВЫ ВЫБРАЛИ КЛАСС: РАЗБОЙНИК",
+                        fontSize = 15.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.offset(
+                            x = (4.dp),
+                            y = 0.dp
+                        )
+                    )
+                },
+                containerColor = Color.hsl(190f, 0.84f, 0.29f, 0.8f),
+                modifier = Modifier.size(
+                    width = 431.dp,
+                    height = 131.dp
+                ),
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            onClassSelected(CharacterClass.ROGUE)
+                            openDialog.value = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.hsl(190f, 0.84f, 0.29f, 1f),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(
+                            width = 293.dp,
+                            height = 42.dp
+                        )
+                    ) {
+                        Text(
+                            text= "В БОЙ",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.offset(
+                                x = 10.dp,
+                                y = 0.dp
+                            )
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_alert_battle),
+                            contentDescription = "Battle",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(29.dp)
+                                .offset(
+                                    x = 13.dp,
+                                    y = 0.dp
+                                )
+                        )
+                    }
+                }
+            )
+        }
+
         Button(
-            onClick = { onClassSelected(CharacterClass.ROGUE) },
+            onClick = { openDialog.value = true },
             modifier = Modifier
                 .width(293.dp)
                 .height(42.dp)
@@ -741,7 +851,7 @@ fun CharacterBarbarianScreen(
         )
 
 
-        Row (
+        Row(
             horizontalArrangement = Arrangement.Absolute.Center,
             verticalAlignment = Alignment.Top,
             modifier = Modifier.padding(start = (57.8).dp)
@@ -759,7 +869,7 @@ fun CharacterBarbarianScreen(
                     fontWeight = FontWeight.ExtraBold
                 )
 
-                Text (
+                Text(
                     text = "ВАРВАР",
                     fontSize = 36.sp,
                     color = Color.White,
@@ -778,7 +888,7 @@ fun CharacterBarbarianScreen(
             }
 
             Box(
-                modifier = Modifier.padding(top = 19.dp)
+                modifier = Modifier.padding(top = 10.dp)
             ) {
 
                 Image(
@@ -787,20 +897,210 @@ fun CharacterBarbarianScreen(
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier
                         .size(
-                            width = 556.dp,
-                            height = 300.dp)
+                            width = 232.dp,
+                            height = 310.dp
+                        )
                         .offset(
-                            x = ((-172).dp),
-                            y = ((-10).dp)
+                            x = ((-25).dp),
+                            y = ((-5).dp)
                         )
                 )
 
             }
 
+            Column(
+                modifier = Modifier
+                    .offset(
+                        x = ((-8.4).dp),
+                        y = 61.dp
+                    )
+                    .size(200.dp)
+            ) {
+
+                Text(
+                    text = "МАКСИМАЛЬНЫЕ ПОКАЗАТЕЛИ:",
+                    fontSize = 14.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold
+                )
+
+                Box {
+
+                    Text(
+                        text = "Урон от атак",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = OnestRegularFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.barbarian_damage),
+                        contentDescription = "Rectangle",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .offset(
+                                x = (110.dp),
+                                y = ((6.5).dp)
+                            )
+                    )
+
+                }
+
+                Box {
+
+                    Text(
+                        text = "Сила в бою",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = OnestRegularFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.barbarian_strength),
+                        contentDescription = "Rectangle",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .offset(
+                                x = (111.dp),
+                                y = ((6.5).dp)
+                            )
+                    )
+
+                }
+
+                Box {
+
+                    Text(
+                        text = "Ловкость",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = OnestRegularFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.barbarian_agility),
+                        contentDescription = "Rectangle",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .offset(
+                                x = (111.dp),
+                                y = ((6.5).dp)
+                            )
+                    )
+
+                }
+
+                Box {
+
+                    Text(
+                        text = "Выносливость",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontFamily = OnestRegularFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.barbarian_endurance),
+                        contentDescription = "Rectangle",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .offset(
+                                x = (111.dp),
+                                y = ((6.5).dp)
+                            )
+                    )
+
+                }
+
+            }
+
+            Image(
+                painter = painterResource(id = R.drawable.choose_right),
+                contentDescription = "Right",
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier
+                    .padding(top = 180.dp)
+                    .offset(
+                        x = ((41.6).dp),
+                        y = 0.dp
+                    )
+                    .clickable(enabled = true, onClick = onRight)
+            )
+
+        }
+
+        val openDialog = remember { mutableStateOf(false) }
+        if (openDialog.value) {
+            AlertDialog(
+                onDismissRequest = { openDialog.value = false },
+                text = {
+                    Text(
+                        text = "ВЫ ВЫБРАЛИ КЛАСС: ВАРВАР",
+                        fontSize = 15.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.offset(
+                            x = (24.dp),
+                            y = 0.dp
+                        )
+                    )
+                },
+                containerColor = Color.hsl(190f, 0.84f, 0.29f, 0.8f),
+                modifier = Modifier.size(
+                    width = 431.dp,
+                    height = 131.dp
+                ),
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            onClassSelected(CharacterClass.BARBARIAN)
+                            openDialog.value = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.hsl(190f, 0.84f, 0.29f, 1f),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(
+                            width = 293.dp,
+                            height = 42.dp
+                        )
+                    ) {
+                        Text(
+                            text = "В БОЙ",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.offset(
+                                x = 10.dp,
+                                y = 0.dp
+                            )
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_alert_battle),
+                            contentDescription = "Battle",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(29.dp)
+                                .offset(
+                                    x = 13.dp,
+                                    y = 0.dp
+                                )
+                        )
+                    }
+                }
+            )
+
         }
 
         Button(
-            onClick = { onClassSelected(CharacterClass.BARBARIAN) },
+            onClick = { openDialog.value = true },
             modifier = Modifier
                 .width(293.dp)
                 .height(42.dp)
@@ -820,151 +1120,24 @@ fun CharacterBarbarianScreen(
                 fontWeight = FontWeight.ExtraBold
             )
         }
-
-        Column(
-            modifier = Modifier
-                .offset(
-                    x = ((520.6).dp),
-                    y = 61.dp
-                )
-                .size(200.dp)
-        ) {
-
-            Text(
-                text = "МАКСИМАЛЬНЫЕ ПОКАЗАТЕЛИ:",
-                fontSize = 14.sp,
-                color = Color.White,
-                fontFamily = OnestExtraBoldFontFamily,
-                fontWeight = FontWeight.ExtraBold
-            )
-
-            Box {
-
-                Text(
-                    text = "Урон от атак",
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    fontFamily = OnestRegularFontFamily,
-                    fontWeight = FontWeight.Normal
-                )
-
-                Image(
-                    painter = painterResource(id = R.drawable.barbarian_damage),
-                    contentDescription = "Rectangle",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .offset(
-                            x = (110.dp),
-                            y = ((6.5).dp)
-                        )
-                )
-
-            }
-
-            Box {
-
-                Text(
-                    text = "Сила в бою",
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    fontFamily = OnestRegularFontFamily,
-                    fontWeight = FontWeight.Normal
-                )
-
-                Image(
-                    painter = painterResource(id = R.drawable.barbarian_strength),
-                    contentDescription = "Rectangle",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .offset(
-                            x = (111.dp),
-                            y = ((6.5).dp)
-                        )
-                )
-
-            }
-
-            Box {
-
-                Text(
-                    text = "Ловкость",
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    fontFamily = OnestRegularFontFamily,
-                    fontWeight = FontWeight.Normal
-                )
-
-                Image(
-                    painter = painterResource(id = R.drawable.barbarian_agility),
-                    contentDescription = "Rectangle",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .offset(
-                            x = (111.dp),
-                            y = ((6.5).dp)
-                        )
-                )
-
-            }
-
-            Box {
-
-                Text(
-                    text = "Выносливость",
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    fontFamily = OnestRegularFontFamily,
-                    fontWeight = FontWeight.Normal
-                )
-
-                Image(
-                    painter = painterResource(id = R.drawable.barbarian_endurance),
-                    contentDescription = "Rectangle",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .offset(
-                            x = (111.dp),
-                            y = ((6.5).dp)
-                        )
-                )
-
-            }
-
-        }
-
-        Image(
-            painter = painterResource(id = R.drawable.choose_right),
-            contentDescription = "Right",
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .padding(top = 180.dp)
-                .offset(
-                    x = ((770.5).dp),
-                    y = 0.dp
-                )
-                .clickable(enabled = true, onClick = onRight)
-        )
-
     }
 
 }
 
 @Composable
-fun BattleScreen(player: Character, monster: Monster, onBattleEnd: (Boolean) -> Unit, log: String) {
-    var localLog by remember { mutableStateOf(log) }
-    val scope = rememberCoroutineScope()
+fun BattleScreen() {
 
-    LaunchedEffect(Unit) {
-        scope.launch {
-            delay(1000) // Задержка для чтения лога
-            onBattleEnd(player.isAlive()) // Передаём результат боя
-        }
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        Image(
+            painter = painterResource(id = R.drawable.battle_bg),
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
+
     }
 
-    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Бой: ${player.currentHealth}/${player.maxHealth} vs ${monster.currentHealth}/${monster.baseHealth}")
-        Text(localLog)
-    }
 }
 
 @Composable
