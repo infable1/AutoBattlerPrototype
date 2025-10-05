@@ -13,10 +13,12 @@ class Character {
     var maxHealth: Int = 0
     var currentHealth: Int = 0
     var winsInRow: Int = 0
+    var chosen: CharacterClass = CharacterClass.WARRIOR
 
     fun initialize(chosenClass: CharacterClass) {
         levels[chosenClass] = 1
         currentWeapon = chosenClass.startingWeapon
+        chosen = chosenClass
         recalculateMaxHealth()
         currentHealth = maxHealth
     }
@@ -129,21 +131,18 @@ data class Monster(
     val strength: Int,
     val dexterity: Int,
     val constitution: Int,
-    val features: List<String>, // Особенности (например, "double_blunt_damage")
+    val features: List<String>,
     val reward: Weapon
 ) {
     var currentHealth: Int = baseHealth // Текущее здоровье
 
-    // Восстановление здоровья до максимума (для нового боя)
     fun restoreHealth() {
         currentHealth = baseHealth
     }
 
-    // Логика атаки (упрощенная, для боя)
     fun calculateDamage(target: Character, turn: Int): Int {
         var baseDamage = weaponDamage + strength
 
-        // Применение особенностей монстра
         when {
             name == "Скелет" && target.currentWeapon.type == WeaponType.BLUNT -> baseDamage *= 2 // Вдвое больше урона от дробящего
             name == "Слайм" && target.currentWeapon.type == WeaponType.SLASHING -> baseDamage = strength // Рубящее не наносит урона, только сила
@@ -164,16 +163,13 @@ data class Monster(
         return maxOf(finalDamage, 0) // Урон не может быть отрицательным
     }
 
-    // Получение урона
     fun takeDamage(damage: Int) {
         currentHealth = maxOf(currentHealth - damage, 0)
     }
 
-    // Проверка жив ли монстр
     fun isAlive(): Boolean = currentHealth > 0
 }
 
-// Компаньон-объект для списка монстров
 object MonsterFactory {
     val monsters = listOf(
         Monster("Гоблин", 5, 2, 1, 1, 1, emptyList(), Weapon.DAGGER),
@@ -184,6 +180,5 @@ object MonsterFactory {
         Monster("Дракон", 20, 4, 3, 3, 3, listOf("fire_breath_3"), Weapon.LEGENDARY_SWORD)
     )
 
-    // Случайный выбор монстра
     fun getRandomMonster(): Monster = monsters.random()
 }

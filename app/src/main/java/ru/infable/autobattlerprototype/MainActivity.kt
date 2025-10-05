@@ -46,6 +46,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import ru.infable.autobattlerprototype.game.GameLogic
+import kotlin.random.Random
 
 val OiFontFamily = FontFamily(
     Font(R.font.oi_regular, FontWeight.Normal)
@@ -84,22 +86,37 @@ class MainActivity : ComponentActivity() {
                     onRight = { currentScreen = "RogueCreation"},
                     onLeft = { currentScreen = "BarbarianCreation"},
                     onClassSelected = { chosenClass ->
-                        currentScreen = "Battle"
+                        player.initialize(chosenClass)
+                        currentScreen = "BattleFirst"
                     }
                 )
                 "RogueCreation" -> CharacterRogueScreen(
                     onLeft = { currentScreen = "WarriorCreation" },
                     onClassSelected = { chosenClass ->
-                        currentScreen = "Battle"
+                        player.initialize(chosenClass)
+                        currentScreen = "BattleFirst"
                     }
                 )
                 "BarbarianCreation" -> CharacterBarbarianScreen(
                     onRight = { currentScreen = "WarriorCreation"},
                     onClassSelected = { chosenClass ->
-                        currentScreen = "Battle"
+                        player.initialize(chosenClass)
+                        currentScreen = "BattleFirst"
                     }
                 )
-                "Battle" -> BattleScreen(
+                "BattleFirst" -> BattleScreenFirst(
+                    player = player,
+                    monster = MonsterFactory.getRandomMonster(),
+                    onBattle = {
+                        if (GameLogic.simulateBattle(player, monster)) {
+                            currentScreen = "WinFirst"
+                        }
+                    }
+                )
+                "WinFirst" -> WinScreenFirst(
+                    player = player
+                )
+                "BattleSecond" -> BattleScreenSecond(
 
                 )
                 "LevelUp" -> LevelUpScreen(
@@ -107,7 +124,7 @@ class MainActivity : ComponentActivity() {
                     onLevelUp = { newClass ->
                         player.levelUp(newClass)
                         currentScreen = "Battle"
-                        monster = MonsterFactory.getRandomMonster() // Новый монстр
+                        monster = MonsterFactory.getRandomMonster()
                     }
                 )
                 "GameWon" -> GameWonScreen(onRestart = {
@@ -469,17 +486,17 @@ fun CharacterWarriorScreen(
             AlertDialog(
                 onDismissRequest = { openDialog.value = false},
                 text = {
-                  Text(
-                      text = "ВЫ ВЫБРАЛИ КЛАСС: ВОИН",
-                      fontSize = 15.sp,
-                      color = Color.White,
-                      fontFamily = OnestExtraBoldFontFamily,
-                      fontWeight = FontWeight.ExtraBold,
-                      modifier = Modifier.offset(
-                          x = (24.dp),
-                          y = 0.dp
-                      )
-                  )
+                    Text(
+                        text = "ВЫ ВЫБРАЛИ КЛАСС: ВОИН",
+                        fontSize = 15.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.offset(
+                            x = (24.dp),
+                            y = 0.dp
+                        )
+                    )
                 },
                 containerColor = Color.hsl(190f, 0.84f, 0.29f, 0.8f),
                 modifier = Modifier.size(
@@ -1125,7 +1142,11 @@ fun CharacterBarbarianScreen(
 }
 
 @Composable
-fun BattleScreen() {
+fun BattleScreenFirst(
+    player: Character,
+    monster: Monster,
+    onBattle: () -> Unit
+) {
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -1136,7 +1157,1376 @@ fun BattleScreen() {
             contentScale = ContentScale.FillBounds
         )
 
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Top
+        ) {
+
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.padding(top = 33.dp, start = 15.dp)
+            ) {
+
+                Text(
+                    text = "Уровень 1",
+                    fontSize = 15.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
+
+                Text(
+                    text = "Урон от атак",
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+
+                when(player.chosen) {
+                    CharacterClass.WARRIOR -> {
+                        when(player.strength) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_damage_4_9),
+                                    contentDescription = "Damage",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_damage_5_9),
+                                    contentDescription = "Damage",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_damage_6_9),
+                                    contentDescription = "Damage",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.ROGUE -> {
+                        when(player.strength) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_damage_3_9),
+                                    contentDescription = "Damage",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_damage_4_9),
+                                    contentDescription = "Damage",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_damage_5_9),
+                                    contentDescription = "Damage",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.BARBARIAN -> {
+                        when(player.strength) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_damage_4_9),
+                                    contentDescription = "Damage",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_damage_5_9),
+                                    contentDescription = "Damage",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_damage_6_9),
+                                    contentDescription = "Damage",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Text(
+                    text = "Сила в бою",
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+
+                when(player.chosen) {
+                    CharacterClass.WARRIOR -> {
+                        when(player.strength) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_strength_1_4),
+                                    contentDescription = "Strength",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_strength_2_4),
+                                    contentDescription = "Strength",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_strength_3_4),
+                                    contentDescription = "Strength",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.ROGUE -> {
+                        when(player.strength) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_strength_1_4),
+                                    contentDescription = "Strength",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_strength_2_4),
+                                    contentDescription = "Strength",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_strength_3_4),
+                                    contentDescription = "Strength",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.BARBARIAN -> {
+                        when(player.strength) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_strength_1_4),
+                                    contentDescription = "Strength",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_strength_2_4),
+                                    contentDescription = "Strength",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_strength_3_4),
+                                    contentDescription = "Strength",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Text(
+                    text = "Ловкость",
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+
+                when(player.chosen) {
+                    CharacterClass.WARRIOR -> {
+                        when(player.dexterity) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_agility_1_4),
+                                    contentDescription = "Agility",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_agility_2_4),
+                                    contentDescription = "Agility",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_agility_3_4),
+                                    contentDescription = "Agility",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.ROGUE -> {
+                        when(player.dexterity) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_agility_1_4),
+                                    contentDescription = "Agility",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_agility_2_4),
+                                    contentDescription = "Agility",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_agility_3_4),
+                                    contentDescription = "Agility",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.BARBARIAN -> {
+                        when(player.dexterity) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_agility_1_4),
+                                    contentDescription = "Agility",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_agility_2_4),
+                                    contentDescription = "Agility",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_agility_3_4),
+                                    contentDescription = "Agility",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Text(
+                    text = "Выносливость",
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+
+                when(player.chosen) {
+                    CharacterClass.WARRIOR -> {
+                        when(player.constitution) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_endurance_1_4),
+                                    contentDescription = "Endurance",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_endurance_2_4),
+                                    contentDescription = "Endurance",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_endurance_3_4),
+                                    contentDescription = "Endurance",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.ROGUE -> {
+                        when(player.constitution) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_endurance_1_4),
+                                    contentDescription = "Endurance",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_endurance_2_4),
+                                    contentDescription = "Endurance",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_endurance_3_4),
+                                    contentDescription = "Endurance",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.BARBARIAN -> {
+                        when(player.constitution) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_endurance_1_4),
+                                    contentDescription = "Endurance",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_endurance_2_4),
+                                    contentDescription = "Endurance",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_endurance_3_4),
+                                    contentDescription = "Endurance",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 10.dp)
+                ) {
+
+                    Text(
+                        text = "Оружие",
+                        fontSize = 12.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(end = 5.dp)
+                    )
+
+                    when(player.chosen) {
+                        CharacterClass.WARRIOR -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_sword),
+                                contentDescription = "Sword",
+                                contentScale = ContentScale.FillBounds,
+                                modifier = Modifier.padding(
+                                    end = 5.dp
+                                )
+                            )
+                        }
+                        CharacterClass.ROGUE -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_dagger),
+                                contentDescription = "Dagger",
+                                contentScale = ContentScale.FillBounds,
+                                modifier = Modifier.padding(
+                                    end = 5.dp
+                                )
+                            )
+                        }
+                        CharacterClass.BARBARIAN -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_club),
+                                contentDescription = "Club",
+                                contentScale = ContentScale.FillBounds,
+                                modifier = Modifier.padding(
+                                    end = 5.dp
+                                )
+                            )
+                        }
+                    }
+
+                    when(player.chosen) {
+                        CharacterClass.WARRIOR -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_chopping),
+                                contentDescription = "Chopping",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                        CharacterClass.ROGUE -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_pricking),
+                                contentDescription = "Pricking",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                        CharacterClass.BARBARIAN -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_crushing),
+                                contentDescription = "Cruching",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                    }
+
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 5.dp)
+                ) {
+
+                    Text(
+                        text = "Бонусы",
+                        fontSize = 12.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(
+                            end = 5.dp
+                        )
+                    )
+
+                    when(player.chosen) {
+                        CharacterClass.WARRIOR -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_bonus_gust),
+                                contentDescription = "Gust",
+                                contentScale = ContentScale.FillBounds,
+                                modifier = Modifier.padding(
+                                    end = 5.dp
+                                )
+                            )
+                        }
+                        CharacterClass.ROGUE -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_bonus_hidden),
+                                contentDescription = "Hidden",
+                                contentScale = ContentScale.FillBounds,
+                                modifier = Modifier.padding(
+                                    end = 5.dp
+                                )
+                            )
+                        }
+                        CharacterClass.BARBARIAN -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_bonus_rage),
+                                contentDescription = "Rage",
+                                contentScale = ContentScale.FillBounds,
+                                modifier = Modifier.padding(
+                                    end = 5.dp
+                                )
+                            )
+                        }
+                    }
+
+                    when(player.chosen) {
+                        CharacterClass.WARRIOR -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_bonus_question),
+                                contentDescription = "Question",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                        CharacterClass.ROGUE -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_bonus_question),
+                                contentDescription = "Question",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                        CharacterClass.BARBARIAN -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_bonus_question),
+                                contentDescription = "Question",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                    }
+                }
+
+            }
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.offset(
+                    x = ((-20).dp)
+                )
+            ) {
+
+                when(player.chosen) {
+                    CharacterClass.WARRIOR -> {
+                        when(player.constitution) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_health_6_6),
+                                    contentDescription = "Health",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(
+                                        top = 35.dp
+                                    )
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_health_7_7),
+                                    contentDescription = "Health",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(
+                                        top = 35.dp
+                                    )
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_health_8_8),
+                                    contentDescription = "Health",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(
+                                        top = 35.dp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.ROGUE -> {
+                        when(player.constitution) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_health_5_5),
+                                    contentDescription = "Health",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(
+                                        top = 35.dp
+                                    )
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_health_6_6),
+                                    contentDescription = "Health",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(
+                                        top = 35.dp
+                                    )
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_health_7_7),
+                                    contentDescription = "Health",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(
+                                        top = 35.dp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                    CharacterClass.BARBARIAN -> {
+                        when(player.constitution) {
+                            1 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_health_7_7),
+                                    contentDescription = "Health",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(
+                                        top = 35.dp
+                                    )
+                                )
+                            }
+                            2 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_health_8_8),
+                                    contentDescription = "Health",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(
+                                        top = 35.dp
+                                    )
+                                )
+                            }
+                            3 -> {
+                                Image(
+                                    painter = painterResource(id = R.drawable.battle_health_9_9),
+                                    contentDescription = "Health",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(
+                                        top = 35.dp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                when(player.chosen) {
+                    CharacterClass.WARRIOR -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.choose_warrior),
+                            contentDescription = "Warrior",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(258.dp)
+                                .padding(top = 15.dp, bottom = 15.dp)
+                        )
+                    }
+                    CharacterClass.ROGUE -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.choose_robber),
+                            contentDescription = "Rogue",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(258.dp)
+                                .padding(top = 15.dp, bottom = 15.dp)
+                                .offset(
+                                    x = 10.dp,
+                                    y = 0.dp
+                                )
+                        )
+                    }
+                    CharacterClass.BARBARIAN -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.choose_barbarian),
+                            contentDescription = "Barbarian",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(
+                                    width = 231.dp,
+                                    height = 265.dp
+                                )
+                        )
+                    }
+                }
+
+                when(player.chosen) {
+                    CharacterClass.WARRIOR -> {
+                        Text(
+                            text = "ВОИН",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
+                    CharacterClass.ROGUE -> {
+                        Text(
+                            text = "РАЗБОЙНИК",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
+                    CharacterClass.BARBARIAN -> {
+                        Text(
+                            text = "ВАРВАР",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                        )
+                    }
+                }
+
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.offset(
+                    x = ((-30).dp)
+                )
+            ) {
+
+                Text(
+                    text = "РАУНД 1",
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(
+                        top = 28.dp,
+                        bottom = 90.dp
+                    )
+                )
+
+                Button(
+                    onClick = {  },
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(42.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.hsl(190f, 0.84f, 0.29f, 1f),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "БОЙ",
+                        fontSize = 20.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+
+            }
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.offset(
+                    x = ((-30).dp)
+                )
+            ) {
+
+                when(monster.name) {
+                    "Гоблин" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_monster_health_6_6),
+                            contentDescription = "Health",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.padding(
+                                top = 35.dp
+                            )
+                        )
+                    }
+                    "Скелет" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_monster_health_11_11),
+                            contentDescription = "Health",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.padding(
+                                top = 35.dp
+                            )
+                        )
+                    }
+                    "Слайм" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_monster_health_10_10),
+                            contentDescription = "Health",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.padding(
+                                top = 35.dp
+                            )
+                        )
+                    }
+                    "Призрак" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_monster_health_7_7),
+                            contentDescription = "Health",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.padding(
+                                top = 35.dp
+                            )
+                        )
+                    }
+                    "Голем" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_monster_health_13_13),
+                            contentDescription = "Health",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.padding(
+                                top = 35.dp
+                            )
+                        )
+                    }
+                    "Дракон" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_monster_health_23_23),
+                            contentDescription = "Health",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.padding(
+                                top = 35.dp
+                            )
+                        )
+                    }
+                }
+
+                when(monster.name) {
+                    "Гоблин" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_goblin),
+                            contentDescription = "Goblin",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(
+                                    width = 188.dp,
+                                    height = 251.dp
+                                )
+                                .padding(
+                                    top = 23.dp
+                                )
+                        )
+                    }
+                    "Скелет" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_skeleton),
+                            contentDescription = "Skeleton",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(
+                                    width = 230.dp,
+                                    height = 251.dp
+                                )
+                                .padding(
+                                    top = 23.dp,
+                                )
+                        )
+                    }
+                    "Слайм" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_slime),
+                            contentDescription = "Slime",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(
+                                    width = 183.dp,
+                                    height = 245.dp
+                                )
+                                .padding(
+                                    top = 23.dp
+                                )
+                        )
+                    }
+                    "Призрак" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_ghost),
+                            contentDescription = "Ghost",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(
+                                    width = 177.dp,
+                                    height = 237.dp
+                                )
+                                .padding(
+                                    top = 23.dp
+                                )
+                        )
+                    }
+                    "Голем" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_golem),
+                            contentDescription = "Golem",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(
+                                    width = 194.dp,
+                                    height = 258.dp
+                                )
+                                .padding(
+                                    top = 13.dp
+                                )
+                        )
+                    }
+                    "Дракон" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_dragon),
+                            contentDescription = "Dragon",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(
+                                    width = 199.dp,
+                                    height = 260.dp
+                                )
+                        )
+                    }
+                }
+
+                when(monster.name) {
+                    "Гоблин" -> {
+                        Text(
+                            text = "ГОБЛИН",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(
+                                top = 8.dp
+                            )
+                        )
+                    }
+                    "Скелет" -> {
+                        Text(
+                            text = "СКЕЛЕТ",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(
+                                top = 7.dp
+                            )
+                        )
+                    }
+                    "Слайм" -> {
+                        Text(
+                            text = "СЛАЙМ",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(
+                                top = 13.dp
+                            )
+                        )
+                    }
+                    "Призрак" -> {
+                        Text(
+                            text = "ПРИЗРАК",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(
+                                top = 23.dp
+                            )
+                        )
+                    }
+                    "Голем" -> {
+                        Text(
+                            text = "ГОЛЕМ",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(
+                                top = 0.dp
+                            )
+                        )
+                    }
+                    "Дракон" -> {
+                        Text(
+                            text = "ДРАКОН",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(
+                                top = 0.dp
+                            )
+                        )
+                    }
+                }
+
+            }
+
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .padding(top = 58.dp)
+                    .offset(
+                        x = ((-15).dp)
+                    )
+            ) {
+
+                Text(
+                    text = "Урон от атак",
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+
+                when(monster.name) {
+                    "Гоблин" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_damage_3_9),
+                            contentDescription = "Damage",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Скелет" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_damage_4_9),
+                            contentDescription = "Damage",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Слайм" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_damage_4_9),
+                            contentDescription = "Damage",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Призрак" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_damage_4_9),
+                            contentDescription = "Damage",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Голем" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_damage_4_9),
+                            contentDescription = "Damage",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Дракон" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_damage_7_9),
+                            contentDescription = "Damage",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Сила в бою",
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+
+                when(monster.name) {
+                    "Гоблин" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_strength_1_4),
+                            contentDescription = "Strength",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Скелет" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_strength_2_4),
+                            contentDescription = "Strength",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Слайм" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_strength_3_4),
+                            contentDescription = "Strength",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Призрак" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_strength_1_4),
+                            contentDescription = "Strength",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Голем" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_strength_3_4),
+                            contentDescription = "Strength",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Дракон" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_strength_3_4),
+                            contentDescription = "Strength",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Ловкость",
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+
+                when(monster.name) {
+                    "Гоблин" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_agility_1_4),
+                            contentDescription = "Agility",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Скелет" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_agility_2_4),
+                            contentDescription = "Agility",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Слайм" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_agility_1_4),
+                            contentDescription = "Agility",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Призрак" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_agility_3_4),
+                            contentDescription = "Agility",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Голем" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_agility_1_4),
+                            contentDescription = "Agility",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Дракон" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_agility_3_4),
+                            contentDescription = "Agility",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Выносливость",
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontFamily = OnestExtraBoldFontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+
+                when(monster.name) {
+                    "Гоблин" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_endurance_1_4),
+                            contentDescription = "Endurance",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Скелет" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_endurance_1_4),
+                            contentDescription = "Endurance",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Слайм" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_endurance_2_4),
+                            contentDescription = "Endurance",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Призрак" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_endurance_1_4),
+                            contentDescription = "Endurance",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Голем" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_endurance_3_4),
+                            contentDescription = "Endurance",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    "Дракон" -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.battle_endurance_3_4),
+                            contentDescription = "Endurance",
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 10.dp)
+                ) {
+
+                    Text(
+                        text = "Особенность",
+                        fontSize = 12.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(end = 5.dp)
+                    )
+
+                    when(monster.name) {
+                        "Гоблин" -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_peculiarity_minus),
+                                contentDescription = "Peculiarity",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                        "Скелет" -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_peculiarity_skeleton),
+                                contentDescription = "Peculiarity",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                        "Слайм" -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_peculiarity_slime),
+                                contentDescription = "Peculiarity",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                        "Призрак" -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_bonus_hidden),
+                                contentDescription = "Hidden",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                        "Голем" -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_bonus_stone),
+                                contentDescription = "Stone",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                        "Дракон" -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.battle_peculiarity_dragon),
+                                contentDescription = "Fire",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
     }
+
+}
+
+@Composable
+fun WinScreenFirst(
+    player: Character
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        Image(
+            painter = painterResource(id = R.drawable.choose_background),
+            contentDescription = "Background Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
+
+        val openDialog = remember { mutableStateOf(false) }
+        if (openDialog.value) {
+            AlertDialog(
+                onDismissRequest = {  },
+                title = {
+                    Text(
+                        text = "ПОБЕДА!",
+                        fontSize = 22.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Получена",
+                        fontSize = 15.sp,
+                        color = Color.White,
+                        fontFamily = OnestExtraBoldFontFamily,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.offset(
+                            x = (24.dp),
+                            y = 0.dp
+                        )
+                    )
+                },
+                containerColor = Color.hsl(190f, 0.84f, 0.29f, 0.8f),
+                modifier = Modifier.size(
+                    width = 431.dp,
+                    height = 131.dp
+                ),
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            onClassSelected(CharacterClass.BARBARIAN)
+                            openDialog.value = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.hsl(190f, 0.84f, 0.29f, 1f),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(
+                            width = 293.dp,
+                            height = 42.dp
+                        )
+                    ) {
+                        Text(
+                            text = "В БОЙ",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontFamily = OnestExtraBoldFontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.offset(
+                                x = 10.dp,
+                                y = 0.dp
+                            )
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_alert_battle),
+                            contentDescription = "Battle",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .size(29.dp)
+                                .offset(
+                                    x = 13.dp,
+                                    y = 0.dp
+                                )
+                        )
+                    }
+                }
+            )
+
+        }
+
+    }
+}
+
+@Composable
+fun BattleScreenSecond() {
 
 }
 

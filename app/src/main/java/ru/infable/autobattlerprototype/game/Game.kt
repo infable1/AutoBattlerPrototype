@@ -39,7 +39,6 @@ object GameLogic {
         }
     }
 
-    // Создание персонажа
     private fun createCharacter(): Character {
         val chosenClass = CharacterClass.values().random()
         val player = Character()
